@@ -8,24 +8,43 @@ export default class FormComponent extends Component{
         this.onChangeName = this.onChangeName.bind(this);
         this.onChangeDob = this.onChangeDob.bind(this);
         this.onChangeWeight = this.onChangeWeight.bind(this);
+        this.onChangePhoneNumber = this.onChangePhoneNumber.bind(this);
+        this.onChangeEmail = this.onChangeEmail.bind(this);
         this.onChangeDonationDate = this.onChangeDonationDate.bind(this);
         this.onChangeGender = this.onChangeGender.bind(this);
         this.onChangeBloodGroup = this.onChangeBloodGroup.bind(this);
+        this.onChangeAddress = this.onChangeAddress.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        this.limit = this.limit.bind(this);
 
         this.state = {
             name: '',
             dob: new Date(),
             gender: '',
             weight: '',
+            phoneNumber: '',
+            email: '',
             bloodGroup: '',
-            donationDate: new Date()
-
+            donationDate: new Date(),
+            address: ''
         }
     }
     bloodGroupArray = [
         'A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'
     ]
+    limit(){
+        const newDate = new Date();
+        let date = newDate.getDate();
+        let month = newDate.getMonth()+1;
+        const year = newDate.getFullYear();
+        if(date<10){
+            date = '0'+date;
+        }
+        if(month<10){
+            month = '0'+month;
+        }
+        return `${year}-${month}-${date}`;
+    }
     onChangeName(e){
         console.log(e.target.value);
         this.setState({
@@ -50,6 +69,16 @@ export default class FormComponent extends Component{
             weight: e.target.value,
         })
     }
+    onChangePhoneNumber(e){
+        this.setState({
+            phoneNumber: e.target.value,
+        })
+    }
+    onChangeEmail(e){
+        this.setState({
+            email: e.target.value
+        });
+    }
     onChangeBloodGroup(e){
         console.log(e.target.value);
         this.setState({
@@ -62,9 +91,26 @@ export default class FormComponent extends Component{
             donationDate: e.target.value,
         })
     }
+    onChangeAddress(e){
+        this.setState({
+            address: e.target.value
+        });
+    }
     onSubmit(e){
         e.preventDefault();
-        console.log('Form Submitted!!');
+        const info = {
+            name: this.state.name,
+            dateOfBirth: this.state.dateOfBirth,
+            gender: this.state.gender,
+            weight: this.state.weight,
+            phoneNumber: this.state.phoneNumber,
+            email: this.state.email,
+            bloodGroup: this.state.bloodGroup,
+            donationDate: this.state.donationDate,
+            address: this.state.address
+        }
+        console.log(info);
+        alert(JSON.stringify(info));
     }
     render(){
         return(
@@ -92,6 +138,7 @@ export default class FormComponent extends Component{
                         <input
                         name='dateOfBirth'
                         type='date'
+                        max={this.limit()}
                         className='formInput'
                         value={this.state.dob}
                         onChange={this.onChangeDob}
@@ -115,10 +162,42 @@ export default class FormComponent extends Component{
                         <input
                         name='weight'
                         type='number'
+                        min='40'
+                        max='200'
                         placeholder='Enter Weight'
                         className='formInput'
                         value={this.state.weight}
                         onChange={this.onChangeWeight}
+                        required />
+                    </section>
+
+                    <section className='formSection'>
+                        <label>
+                            Phone Number:
+                        </label>
+                        <input
+                        name='phone number'
+                        min='1000000000'
+                        max='10000000000'
+                        type='number'
+                        placeholder='Enter Phone Number'
+                        className='formInput'
+                        value={this.state.phoneNumber}
+                        onChange={this.onChangePhoneNumber}
+                        required />
+                    </section>
+
+                    <section className='formSection'>
+                        <label>
+                            Email:
+                        </label>
+                        <input
+                        name='email'
+                        type='email'
+                        placeholder='someone@gmail.com'
+                        className='formInput'
+                        value={this.state.email}
+                        onChange={this.onChangeEmail}
                         required />
                     </section>
 
@@ -144,6 +223,19 @@ export default class FormComponent extends Component{
                         value={this.state.donationDate}
                         onChange={this.onChangeDonationDate}
                         required />
+                    </section>
+
+                    <section className='formSection'>
+                        <label>
+                            Address:
+                        </label>
+                        <textarea
+                        name='address'
+                        placeholder='Enter Address'
+                        className='formInput'
+                        value={this.state.address}
+                        onChange={this.onChangeAddress}
+                        required></textarea>
                     </section>
 
                     <section className='formSection'>
