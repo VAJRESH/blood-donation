@@ -7,7 +7,7 @@
     --heading-light: rgb(212, 212, 212);
     --light-shade: rgb(240, 240, 240);
     --dark-black-shade:  rgb(30, 30, 30);
-    --light-black-shade:  rgb(60, 60, 60);
+    --light-black-shade:  #fcfcfc;
 }
 .formContainer{
     display: flex;
@@ -23,7 +23,7 @@
     font-style: italic;
 }
 .formContainer > form{
-    height: 90vh;
+    height: 98vh;
     margin: auto;
     background-color: var(--light-shade);
     font-style: italic;
