@@ -4,10 +4,10 @@
     box-sizing: border-box;
 }
 :root{
-    --heading-light: rgb(212, 212, 212);
+    --heading: rgb(44, 44, 44);
     --light-shade: rgb(240, 240, 240);
-    --dark-black-shade:  rgb(30, 30, 30);
-    --light-black-shade:  #fcfcfc;
+    --grey-shade:  rgb(173, 173, 173);
+    --light-shade:  #fcfcfc;
 }
 .formContainer{
     display: flex;
@@ -16,34 +16,42 @@
     text-align: center;
     height: 100vh;
     width: 100vw;
-    background-color: var(--light-black-shade);
+    background-color: var(--light-shade);
 }
 .formContainer > h2{
-    color: var(--heading-light);
+    color: var(--heading);
+    margin: 1vh;
     font-style: italic;
+    text-align: center;
 }
 .formContainer > form{
-    height: 98vh;
+    height: 90vh;
+    width: 90vw;
     margin: auto;
-    background-color: var(--light-shade);
     font-style: italic;
+}
+fieldset{
     border-radius: 10px;
-    overflow-y: scroll;
-    box-shadow: 0px 0px 10px 5px var(--dark-black-shade);
+    margin: 1em;
+}
+legend{
+    font-size: large;
+    font-weight: bold;
 }
 .formSection{
     display: grid;
     grid-template-columns: 30% 70%;
+    margin: auto;
     width: 60vw;
 }
 .formSection > label, .formInput, input{
-    font: normal small-caps 500 1.1rem sans-serif;
-    border-radius: 10px;
+    font: normal normal 500 1.1rem sans-serif;
+    border-radius: 5px;
+    text-align: left;
     margin: 1em;
 }
 .formInput{
-    border: 2px solid var(--dark-black-shade);
-    padding: 0 10px; 
+    border: 2px solid var(--grey-shade);
 }
 input[type='submit']{
     grid-column: 1/3;

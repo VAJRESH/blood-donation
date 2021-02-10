@@ -1,4 +1,3 @@
-import './App.css';
 import FormComponent from './components/form-component';
 
 function App() {
