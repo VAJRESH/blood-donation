@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import '../css/form-style.css'
 
 export default class FormComponent extends Component{
@@ -20,12 +21,12 @@ export default class FormComponent extends Component{
         this.state = {
             name: '',
             dob: new Date(),
-            gender: '',
+            gender: 'Male',
             weight: '',
+            bloodGroup: 'A+',
+            donationDate: new Date(),
             phoneNumber: '',
             email: '',
-            bloodGroup: '',
-            donationDate: new Date(),
             address: ''
         }
     }
@@ -100,7 +101,7 @@ export default class FormComponent extends Component{
         e.preventDefault();
         const info = {
             name: this.state.name,
-            dateOfBirth: this.state.dateOfBirth,
+            dateOfBirth: this.state.dob,
             gender: this.state.gender,
             weight: this.state.weight,
             phoneNumber: this.state.phoneNumber,
@@ -111,10 +112,14 @@ export default class FormComponent extends Component{
         }
         console.log(info);
         alert(JSON.stringify(info));
+        axios.post('http://localhost:4000/donor/add', info)
+        .then(() => alert('entry added'))
+        .catch(err => console.log(err));
     }
     render(){
         return(
             <div className='formContainer'>
+                <a href='/'>Donors</a>
                 <h2>Blood Donation Details</h2>
                 <form onSubmit={this.onSubmit}>
                     <fieldset>
@@ -140,8 +145,8 @@ export default class FormComponent extends Component{
                             <input
                             name='dateOfBirth'
                             type='date'
-                            max={this.limit()}
                             className='formInput'
+                            max={this.limit()}
                             value={this.state.dob}
                             onChange={this.onChangeDob}
                             required />
@@ -195,6 +200,7 @@ export default class FormComponent extends Component{
                             name='BloodDonationDate'
                             type='date'
                             className='formInput'
+                            max={this.limit()}
                             value={this.state.donationDate}
                             onChange={this.onChangeDonationDate}
                             required />
@@ -232,6 +238,7 @@ export default class FormComponent extends Component{
                             onChange={this.onChangeEmail}
                             required />
                         </section>
+                        
                         <section className='formSection'>
                             <label>
                                 Address:
