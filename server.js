@@ -27,7 +27,7 @@ app.use(cors());
 app.use(express.json());
 
 const donor = require('./routes/crud_actions');
-app.use('/donor/', donor);
+app.use('/donor', donor);
 
 const publicPath = path.join(__dirname, 'frontend', 'build');
 
