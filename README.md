@@ -8,7 +8,7 @@
 - A form is presented when you visit the website which takes input.
 
 ## Feature To Add
-- [0] Connect to [Database](https://en.wikipedia.org/wiki/Database).
+- [x] Connect to [Database](https://en.wikipedia.org/wiki/Database).
 - [ ] Show All Entries.
 - [ ] [CRUD actions](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) on entries.
 
