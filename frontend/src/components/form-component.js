@@ -112,7 +112,7 @@ export default class FormComponent extends Component{
         }
         console.log(info);
         alert(JSON.stringify(info));
-        axios.post('http://localhost:4000/donor/add', info)
+        axios.post('/donor/add', info)
         .then(() => alert('entry added'))
         .catch(err => console.log(err));
     }

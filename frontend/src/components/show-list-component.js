@@ -23,7 +23,7 @@ export default class ShowList extends Component{
         }
     }
     componentDidMount(){
-        axios.get('/donor/')
+        axios.get('/donor')
             .then(res => this.setState({ donor: res.data }))
             .catch(err => console.log(err));
     }
