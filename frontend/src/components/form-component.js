@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import '../css/form-style.css'
+import '../css/form-style.css';
+
+import { sortArray, getFormattedDate } from '../helper/functions';
 
 export default class FormComponent extends Component{
     constructor(props){
         super(props);
+        this.id = props.match.params.id;
 
         this.onChangeName = this.onChangeName.bind(this);
         this.onChangeDob = this.onChangeDob.bind(this);
@@ -16,7 +19,6 @@ export default class FormComponent extends Component{
         this.onChangeBloodGroup = this.onChangeBloodGroup.bind(this);
         this.onChangeAddress = this.onChangeAddress.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
-        this.limit = this.limit.bind(this);
 
         this.state = {
             name: '',
@@ -33,18 +35,25 @@ export default class FormComponent extends Component{
     bloodGroupArray = [
         'A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'
     ]
-    limit(){
-        const newDate = new Date();
-        let date = newDate.getDate();
-        let month = newDate.getMonth()+1;
-        const year = newDate.getFullYear();
-        if(date<10){
-            date = '0'+date;
+    componentDidMount(){
+        if(this.id){
+            axios.get('/donor/'+this.id)
+                .then(res => {
+                    console.log(res.data)
+                    res.data.donationDate = sortArray(res.data.donationDate);
+                    this.setState({
+                        name: res.data.name,
+                        dob: getFormattedDate(new Date(res.data.dateOfBirth)),
+                        gender: res.data.gender,
+                        weight: res.data.weight,
+                        bloodGroup: res.data.bloodGroup,
+                        donationDate: getFormattedDate(new Date(res.data.donationDate[res.data.donationDate.length-1])),
+                        phoneNumber: res.data.phoneNumber,
+                        email: res.data.email,
+                        address: res.data.address
+                    })
+                })
         }
-        if(month<10){
-            month = '0'+month;
-        }
-        return `${year}-${month}-${date}`;
     }
     onChangeName(e){
         console.log(e.target.value);
@@ -112,9 +121,16 @@ export default class FormComponent extends Component{
         }
         console.log(info);
         alert(JSON.stringify(info));
-        axios.post('/donor/add', info)
-        .then(() => alert('entry added'))
-        .catch(err => console.log(err));
+        if(this.id){
+            // axios.post('/donor/updateDetails/'+this.id, info)
+            axios.post('/donor/updateDetails/'+this.id, info)
+                .then(res => console.log(res.data.message))
+                .catch(err => console.log(err));
+        } else{
+            axios.post('/donor/add', info)
+                .then(res => console.log(res.data.message))
+                .catch(err => console.log(err));
+        }
     }
     render(){
         return(
@@ -146,7 +162,7 @@ export default class FormComponent extends Component{
                             name='dateOfBirth'
                             type='date'
                             className='formInput'
-                            max={this.limit()}
+                            max={getFormattedDate()}
                             value={this.state.dob}
                             onChange={this.onChangeDob}
                             required />
@@ -178,32 +194,30 @@ export default class FormComponent extends Component{
                             required />
                         </section>
                     </fieldset>
-
                     <fieldset>
                         <legend>Donation Details</legend>
                         <section className='formSection'>
                             <label>
-                                Blood Group:
-                            </label>
-                            <select onChange={this.onChangeBloodGroup} className='formInput'>
-                                {this.bloodGroupArray.map(value => (
-                                    <option key={value} value={value}>{value}</option>
-                                ))}
-                            </select>
-                        </section>
-
-                        <section className='formSection'>
-                            <label>
-                                Blood Donation Date:
+                                Latest Blood Donation Date:
                             </label>
                             <input
                             name='BloodDonationDate'
                             type='date'
                             className='formInput'
-                            max={this.limit()}
+                            max={getFormattedDate()}
                             value={this.state.donationDate}
                             onChange={this.onChangeDonationDate}
                             required />
+                        </section>
+                        <section className='formSection'>
+                            <label>
+                                Blood Group:
+                            </label>
+                            <select onChange={this.onChangeBloodGroup} value={this.state.bloodGroup} className='formInput'>
+                                {this.bloodGroupArray.map(value => (
+                                    <option key={value} value={value}>{value}</option>
+                                ))}
+                            </select>
                         </section>
                     </fieldset>
 
@@ -256,7 +270,7 @@ export default class FormComponent extends Component{
 
                     <section className='formSection'>
                         <input
-                        value='submit'
+                        value={this.id? 'update': 'submit'}
                         type='submit' />
                     </section>
                 </form>

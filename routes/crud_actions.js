@@ -3,12 +3,14 @@ const express = require('express');
 let Donor = require('../models/donors.model');
 let router = express.Router();
 
+// const capitalizeFirstLetter = name => {}
+
 //** GET REQUESTS
 // get all entries
 router.route('/').get((req, res) => {
     Donor.find({})
-    .then(donor => res.json(donor))
-    .catch(err => res.status(400).json('Error: ' + err));
+        .then(donor => res.json(donor))
+        .catch(err => res.status(400).json('Error: ' + err));
 });
 
 // search for a single entry
@@ -22,7 +24,7 @@ router.route('/:id').get((req, res) => {
 //** DELETE REQUESTS 
 // delete a entry
 router.route('/:id').delete((req, res) => {
-    Donor.findByIdAndDelete(req.params.id)
+    Donor.findByIdAndDelete(req.params.id).sort({ donationDate: 1})
     .then(donor => {
         res.json({ message: `${donor.name}'s entry deleted` })
     })
@@ -62,15 +64,18 @@ router.route('/add').post((req, res) => {
 });
 
 // update a entry
-router.route('/update/:id').post((req, res) => {
-    Birthday.findById(req.params.id)
+router.route('/updateDetails/:id').post((req, res) => {
+    Donor.findById(req.params.id)
         .then(donor => {
+            console.log(donor)
+            const dateArray =  donor.donationDate;
+            dateArray[0] = req.body.donationDate;
             donor.name = req.body.name;
             donor.dateOfBirth = req.body.dateOfBirth;
             donor.gender = req.body.gender;
             donor.weight = req.body.weight;
             donor.bloodGroup = req.body.bloodGroup;
-            donor.donationDate = req.body.donationDate;
+            donor.donationDate = dateArray;
             donor.phoneNumber = req.body.phoneNumber;
             donor.email = req.body.email;
             donor.address = req.body.address;
@@ -79,7 +84,19 @@ router.route('/update/:id').post((req, res) => {
             donor.save()
                 .then(() => res.json({message: `${donor.name}'s entry updated` }))
                 .catch(err => res.status(400).json(`Error: ${console.log(err)}`));
-            }).catch(err => res.status(400).json(`Error: ${console.log(err)}`));
+            })
+            .catch(err => res.status(400).json(`Error: ${console.log(err)}`));
+});
+router.route('/addDate/:id').post((req, res) => {
+    Donor.findById(req.params.id)
+        .then(donor => {
+            donor.donationDate.push(req.body.donationDate);
+        
+            donor.save()
+                .then(() => res.json({message: `New Donation Date added in ${donor.name} profile` }))
+                .catch(err => res.status(400).json(`Error: ${console.log(err)}`));
+            })
+            .catch(err => res.status(400).json(`Error: ${console.log(err)}`));
 });
 
 module.exports = router;

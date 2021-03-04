@@ -6,7 +6,7 @@ let Donor = new Schema({
     dateOfBirth: { type: Date, required: true },
     gender: { type: String, required: true },
     weight: { type: Number, required: true },
-    donationDate: { type: Date, required: true },
+    donationDate: [{ type: Date, required: true }],
     bloodGroup: { type: String, required: true },
     phoneNumber: { type: Number, required: true },
     email: { type: String, required: true },
