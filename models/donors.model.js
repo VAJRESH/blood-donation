@@ -8,6 +8,7 @@ let Donor = new Schema({
     weight: { type: Number, required: true },
     donationDate: [{ type: Date, required: true }],
     bloodGroup: { type: String, required: true },
+    donationAmount: { type: Number, required: true },
     phoneNumber: { type: Number, required: true },
     email: { type: String, required: true },
     address: { type: String, required: true }

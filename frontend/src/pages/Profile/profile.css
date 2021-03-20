@@ -1,0 +1,13 @@
+.inline-text-active, .input-active{
+    text-align: left;
+}
+
+.inline-text-active{
+    cursor: pointer;
+}
+.inline-text-hidden, .input-hidden{
+    display: none;
+}
+.inline-text-active{
+    text-align: center;
+}

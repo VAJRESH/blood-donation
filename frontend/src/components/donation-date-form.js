@@ -8,61 +8,33 @@ class DonationDate extends Component {
         super(props);
         this.id = props.match.params.id;
 
-        this.onChangeWeight = this.onChangeWeight.bind(this);
-        this.onChangeDonationDate = this.onChangeDonationDate.bind(this);
+        this.handleChange = this.handleChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
 
         this.state = {
-            name: '',
-            gender: 'Male',
-            weight: '',
-            bloodGroup: 'A+',
-            donationDate: new Date(),
-            lastDonationDates: '',
-            phoneNumber: '',
-            email: '',
+            donationDate: getFormattedDate(),
+            weight: 60,
+            amount: 500
         }
     }
-    componentDidMount(){
-        if(this.id){
-            axios.get('/donor/'+this.id)
-                .then(res => {
-                    console.log(res.data)
-                    this.setState({
-                        name: res.data.name,
-                        gender: res.data.gender,
-                        weight: res.data.weight,
-                        lastDonationDate: res.data.donationDate,
-                        bloodGroup: res.data.bloodGroup,
-                        phoneNumber: res.data.phoneNumber,
-                        email: res.data.email,
-                    })
-                })
-        }
-    }
-    onChangeWeight(e){
-        console.log(e.target.value);
-        this.setState({
-            weight: e.target.value,
-        })
-    }
-    onChangeDonationDate(e){
-        console.log(e.target.value);
-        this.setState({
-            donationDate: e.target.value,
-        })
+    handleChange(e){
+        const key = e.target.getAttribute('name');
+        const donorInfo = this.state;
+        donorInfo[key] = e.target.value;
+        console.log(donorInfo);
+        this.setState(donorInfo);
     }
     onSubmit(e){
         e.preventDefault();
         const info = {
-            weight: this.state.weight,
-            donationDate: this.state.donationDate,
+            ...this.state,
+            userId: this.id
         }
         console.log(info);
         alert(JSON.stringify(info));
 
         axios.post('/donor/addDate/'+this.id, info)
-            .then(res => console.log(res.message))
+            .then(res => console.log(res.data.message))
             .catch(err => console.log(err));
     }
     render() {
@@ -79,12 +51,12 @@ class DonationDate extends Component {
                             Blood Donation Date:
                         </label>
                         <input
-                        name='BloodDonationDate'
+                        name='donationDate'
                         type='date'
                         className='formInput'
                         max={getFormattedDate()}
                         value={this.state.donationDate}
-                        onChange={this.onChangeDonationDate}
+                        onChange={this.handleChange}
                         required />
                     </section>
                     <section className='formSection'>
@@ -99,8 +71,25 @@ class DonationDate extends Component {
                         placeholder='Enter Weight'
                         className='formInput'
                         value={this.state.weight}
-                        onChange={this.onChangeWeight}
+                        onChange={this.handleChange}
                         required />
+                    </section>
+                    <section className='formSection'>
+                        <label>
+                            Amount:
+                        </label>
+                        <select
+                        name='amount'
+                        className='formInput'
+                        value={this.state.amount}
+                        onChange={this.handleChange}
+                        required>
+                            {[250, 500, 750, 1000].map(value => {
+                                return (
+                                    <option key={value}>{value}</option>
+                                )
+                            })}
+                        </select>
                     </section>
                     <section className='formSection'>
                         <input
