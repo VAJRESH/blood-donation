@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 let Donor = new Schema({
-    name: { type: String, required: true, trim: true },
+    first_name: { type: String, required: true, trim: true },
+    middle_name: { type: String, trim: true },
+    last_name: { type: String, required: true, trim: true },
     dateOfBirth: { type: Date, required: true },
     gender: { type: String, required: true },
     weight: { type: Number, required: true },

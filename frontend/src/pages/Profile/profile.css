@@ -9,5 +9,7 @@
     display: none;
 }
 .inline-text-active{
+    border: transparent;
     text-align: center;
+    outline: transparent;
 }

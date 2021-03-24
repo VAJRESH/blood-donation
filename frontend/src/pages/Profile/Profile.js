@@ -17,14 +17,10 @@ class Profile extends Component {
             person:'',
             update: '',
             isEditOn: {
-                name: false,
-                dateOfBirth: false,
                 weight: false,
-                gender: false,
                 email: false,
                 phoneNumber: false,
                 address: false,
-                bloodGroup: false,
                 donationDate: [false, false],
             },
             age: 0
@@ -38,6 +34,7 @@ class Profile extends Component {
         axios.get('/donor/'+this.id)
             .then(res => {
                 res.data.donationDate = sortArray(res.data.donationDate)
+                console.log(res.data)
                 this.setState({
                     person: res.data,
                     update: res.data
@@ -67,10 +64,12 @@ class Profile extends Component {
     donationDates(){
         if(this.state.person !== ''){
             return (
+                // TODO edit value only after enter is press
                 this.getLastTwoDates(this.state.person.donationDate)
                 .map((dates, index) => {
+                    console.log(this.state.person.donationDate)
                     const lengthOfDateArray = this.state.person.donationDate.length;
-                    let arrayIndex = index===0? lengthOfDateArray+2: lengthOfDateArray+1;
+                    let arrayIndex = index===0? lengthOfDateArray-1: lengthOfDateArray-2;
                     return (
                         this.state.update.donationDate &&
                         <p key={dates+Math.random()}>
@@ -89,7 +88,7 @@ class Profile extends Component {
                                 onFocus={this.handleEvents}
                                 onBlur={this.editContent}
                                 max={getFormattedDate()}
-                                value={getFormattedDate(this.state.person.donationDate[arrayIndex]) || getFormattedDate()}
+                                value={getFormattedDate(this.state.update.donationDate[arrayIndex])}
                                 className={`input input-${this.state.isEditOn.donationDate[index]? 'active': 'hidden'}`}
                                 />
                         </p>
@@ -100,15 +99,17 @@ class Profile extends Component {
     }
     editContent(e){
         console.log(e.target)
-        let updateState = {...this.state}, key = e.target.getAttribute('name');
+        let changeEditOn = {...this.state.isEditOn}, key = e.target.getAttribute('name');
         if(key.includes('donationDate')){
             let index = key.endsWith(0)? 0: 1;
             key = key.slice(0, key.length-1);
-            updateState.isEditOn[key][index] = !this.state.isEditOn[key][index]; 
+            changeEditOn[key][index] = !this.state.isEditOn[key][index]; 
         } else {
-            updateState.isEditOn[key] = !this.state.isEditOn[key]; 
+            changeEditOn[key] = !this.state.isEditOn[key]; 
         }
-        this.setState(updateState)
+        this.setState({
+            isEditOn: changeEditOn
+        })
     }
     handleChange(e){
         console.log(e)
@@ -158,29 +159,25 @@ class Profile extends Component {
                 data: [
                     {
                         displayValue: {
-                            name: 'Name: ',
-                            value: this.state.person.name
+                            name: 'First Name: ',
+                            value: this.state.person.first_name
                         },
-                        input: {
-                            name: 'name',
-                            type: 'text',
-                            value: this.state.update.name,
-                        },
-                        toggleEdit: this.state.isEditOn.name
+                        input: {},
+                    },
+                    {
+                        displayValue: 
+                        this.state.person.middle_name? {
+                            name: 'Middle Name: ',
+                            value: this.state.person.middle_name
+                        }: {},
+                        input: {},
                     },
                     {
                         displayValue: {
-                            name: 'Weight: ',
-                            value: this.state.person.weight
+                            name: 'Last Name: ',
+                            value: this.state.person.last_name
                         },
-                        input: {
-                            name: 'weight',
-                            type: 'number',
-                            min: '40',
-                            max: '200',
-                            value: this.state.update.weight
-                        },
-                        toggleEdit: this.state.isEditOn.weight
+                        input: {},
                     },
                     {
                         displayValue: {
@@ -193,7 +190,6 @@ class Profile extends Component {
                             max: getFormattedDate(),
                             value: getFormattedDate(this.state.update.dateOfBirth)
                         },
-                        toggleEdit: this.state.isEditOn.dateOfBirth
                     },
                     {
                         displayValue: {
@@ -211,7 +207,6 @@ class Profile extends Component {
                             value: this.state.update.gender
                         },
                         options: ['Male', 'Female'],
-                        toggleEdit: this.state.isEditOn.gender
                     },
                     {
                         displayValue: {
@@ -223,7 +218,20 @@ class Profile extends Component {
                             value: this.state.update.bloodGroup
                         },
                         options: bloodGroupArray,
-                        toggleEdit: this.state.isEditOn.bloodGroup
+                    }, 
+                    {
+                        displayValue: {
+                            name: 'Weight: ',
+                            value: this.state.person.weight
+                        },
+                        input: {
+                            name: 'weight',
+                            type: 'number',
+                            min: '40',
+                            max: '200',
+                            value: this.state.update.weight
+                        },
+                        toggleEdit: this.state.isEditOn.weight
                     }
                 ]
             },
@@ -259,7 +267,7 @@ class Profile extends Component {
                             name: 'Phone Number: ',
                             value: this.state.person.phoneNumber
                         },
-                        textarea: {
+                        input: {
                             name: 'phoneNumber',
                             type: 'number',
                             value: this.state.update.phoneNumber,
@@ -267,15 +275,21 @@ class Profile extends Component {
                         toggleEdit: this.state.isEditOn.phoneNumber
                     },
                 ]
-            }
+            },
         ]
+        const toggleInput = ['weight', 'email', 'donationDate0'];
         return (
             <div>
                 {
-                    this.state.update.name &&
-                    donorData.map(info => {
+                    this.state.update.first_name &&
+                    donorData.map((info, index)=> {
+                        console.log(toggleInput[index]);
                         return (
-                            <Section title={info.name} key={info.name}>
+                            <Section 
+                                title={info.name} 
+                                key={info.name}
+                                name={toggleInput[index]}
+                                onClick={this.editContent}>
                                 {
                                     info.data.map(detail => {
                                         return (
@@ -286,8 +300,12 @@ class Profile extends Component {
                                                 textarea={detail.textarea}
                                                 options={detail.options}
                                                 toggleEdit={detail.toggleEdit}
-                                                handlers={[this.handleChange, this.handleEvents, this.editContent]}
-                                                key={detail.displayValue.name}
+                                                handlers={
+                                                    detail.toggleEdit !== undefined?
+                                                    [this.handleChange, this.handleEvents, this.editContent]:
+                                                    []
+                                                }
+                                                key={detail.displayValue.name || Math.random()}
                                             />
                                         )
                                     })
@@ -297,9 +315,26 @@ class Profile extends Component {
                     })
 
                 }
-                <Section title='Donation Date'>
+                <Section 
+                    title='Recent Donation Date'
+                    name={toggleInput[2]}
+                    onClick={this.editContent}>
                     {this.donationDates()}
                     <Link to={`/donation/${this.id}`}>Add New Entry</Link>
+                </Section>
+                <Section>
+                    {
+                        this.state.person.donationDate &&
+                        <p>
+                            {
+                                `${this.state.person.first_name} 
+                                has donated blood ${this.state.person.donationDate.length} 
+                                time${this.state.person.donationDate.length>1?'s': ''} and total
+                                ${this.state.person.donationAmount} ml. 
+                                `
+                            }
+                        </p>
+                    }
                 </Section>
             </div>
         );

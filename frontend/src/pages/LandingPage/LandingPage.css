@@ -8,7 +8,7 @@ table, th, td{
 table{
     width: calc(100% - 10vw);
     border-collapse: collapse;
-    margin: auto 5vw;
+    margin: auto;
     text-align: center;
 }
 th{

@@ -11,8 +11,8 @@ const DisplayListTable = function (props){
                 <TableRow
                     isHeading={true}
                     rowData={[ 
-                        'Name', 'Blood Group', 'Age', 'Weight', 'Blood Donated(ml)',
-                        'Recent Donation', 'Contact', 'Actions'
+                        'Name', 'Blood Group', 'Age', 'Weight', 'Amount (ml)',
+                        'Recent Donation', 'Phone No.', 'Email', 'Actions'
                     ]}
                 />
             </thead>
@@ -34,7 +34,7 @@ const DisplayListTable = function (props){
                                 rowData={[
                                     (
                                         <a href={`/profile/${donor._id}`}>
-                                            {`${donor.name} (${donor.gender === 'Male'? 'M': 'F'})`}
+                                            {`${donor.first_name} ${donor.middle_name} ${donor.last_name} (${donor.gender === 'Male'? 'M': 'F'})`}
                                         </a>
                                     ),
                                     donor.bloodGroup,
@@ -42,13 +42,20 @@ const DisplayListTable = function (props){
                                     donor.weight,
                                     donor.donationAmount,
                                     new Date(donor.donationDate[donor.donationDate.length-1]).toDateString(),
+                                    donor.phoneNumber,
+                                    donor.email,
                                     (
                                         <>
-                                            <p>{donor.phoneNumber}</p>
-                                            <p>{donor.email}</p>
+                                            <a href={`/edit/${donor._id}`}>
+                                                <button>
+                                                    Edit
+                                                </button>
+                                            </a>
+                                            <button onClick={() => props.deleteEntry(donor._id)}>
+                                                Delete
+                                            </button>
                                         </>
-                                    ),
-                                    <button onClick={() => props.deleteEntry(donor._id)}>Delete</button>
+                                    )
                                 ]}
                             />
                         );

@@ -27,7 +27,7 @@ router.route('/:id').get((req, res) => {
 router.route('/:id').delete((req, res) => {
     Donor.findByIdAndDelete(req.params.id).sort({ donationDate: 1})
     .then(donor => {
-        res.json({ message: `${donor.name}'s entry deleted` })
+        res.json({ message: `${donor.first_name}'s entry deleted` })
     })
     .catch(err => res.status(400).json(`Error: ${err}`));
 });
@@ -37,7 +37,9 @@ router.route('/:id').delete((req, res) => {
 // add new entry
 router.route('/add').post((req, res) => {
     console.log(req.body);
-    const name = req.body.name;
+    const first_name = req.body.firstName;
+    const middle_name = req.body.middleName;
+    const last_name = req.body.lastName;
     const dateOfBirth = req.body.dateOfBirth;
     const gender = req.body.gender;
     const weight = req.body.weight;
@@ -49,7 +51,9 @@ router.route('/add').post((req, res) => {
     const address = req.body.address;
 
     const newDonor = new Donor({
-        name,
+        first_name,
+        middle_name,
+        last_name,
         dateOfBirth,
         gender,
         weight,
@@ -62,7 +66,7 @@ router.route('/add').post((req, res) => {
     });
 
     newDonor.save()
-        .then(() => res.json({ message: `${newDonor.name} entry added` }))
+        .then(() => res.json({ message: `${newDonor.first_name} entry added` }))
         .catch(err => res.status(400).json(`Error: ${console.log(err)}`));
 });
 
@@ -87,7 +91,7 @@ router.route('/updateDetails/:id').post((req, res) => {
             }
             console.log(donor);
             donor.save()
-                .then(() => res.json({message: `${donor.name}'s ${valueUpdated} updated` }))
+                .then(() => res.json({message: `${donor.first_name}'s ${valueUpdated} updated` }))
                 .catch(err => res.status(400).json(`Error: ${console.log(err)}`));
             })
             .catch(err => res.status(400).json(`Error: ${console.log(err)}`));
@@ -154,7 +158,7 @@ router.route('/addDate/:id').post((req, res) => {
         .then(donor => {
             // save the data in database
             donor.save()
-                .then(() => res.json({message: `New Donation Date added in ${donor.name} profile` }))
+                .then(() => res.json({message: `New Donation Date added in ${donor.first_name} profile` }))
                 .catch(err => res.status(400).json(`Error: ${console.log(err)}`));
         })
         .catch(err => console.log(`Error: ${console.log(err)}`));

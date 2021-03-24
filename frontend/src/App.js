@@ -15,6 +15,7 @@ function App() {
         <Route exact path='/' component={LandingPage}/>
         <Route path='/add' component={FormComponent}/>
         <Route path='/donation/:id' component={DonationDate}/>
+        <Route path='/edit/:id' component={FormComponent}/>
         <Route path='/profile/:id' component={Profile}/>
       </Router>
     </div>

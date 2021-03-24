@@ -1,43 +1,40 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import DisplayListTable from '../../components/Table/DisplayListTable';
 import './LandingPage.css';
 
 // class component which will show donors list in a table
-export default class LandingPage extends Component{
-    constructor(props){
-        super(props);
-        
-        this.state = {
-            donor: []
-        }
+export default function LandingPage() {
+    const [Donor, setDonor] = useState();
 
-        this.deleteEntry = this.deleteEntry.bind(this);
-    }
-    componentDidMount(){
+    useEffect(() => {
         axios.get('/donor')
-            .then(res => this.setState({ donor: res.data }))
+            .then(res => setDonor(res.data))
             .catch(err => console.log(err));
-    }
-    deleteEntry(id){      
+    }, []);
+    
+    function deleteEntryById(id){      
         axios.delete(`/donor/${id}`)
             .then(res => {
                 console.log(res.data.message);
                 alert(res.data.message);
-                this.setState({
-                    donor: this.state.donor.filter(person => person._id !== id)
-                })
+                setDonor(Donor.filter(person => person._id !== id))
             })
             .catch(err => console.log(err));
     }
-    render(){
-        return (
-            <div className='container'>
+    let loading = (Donor === undefined) ? 
+        ( <> Loading </> ) : 
+        (
+            <>
                 <h1>Entries Added</h1>
-                <DisplayListTable donorData={this.state.donor} deleteEntry={this.deleteEntry}/>
-            </div>
-        )
-    }
+                <DisplayListTable donorData={Donor || []} deleteEntry={deleteEntryById}/>
+            </>
+        );
+    return (
+        <div className='container'>
+            {loading}
+        </div>
+    )
 }
 

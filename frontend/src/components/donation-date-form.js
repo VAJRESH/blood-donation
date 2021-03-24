@@ -40,62 +40,60 @@ class DonationDate extends Component {
     render() {
         return (
             <div className='formContainer'>
-                <a href='/'>Donors</a>
-                <h2>New Blood Donation Date</h2>
-                <section>
-                    {console.log(this.state)}
-                </section>
                 <form onSubmit={this.onSubmit}>
-                    <section className='formSection'>
-                        <label>
-                            Blood Donation Date:
-                        </label>
-                        <input
-                        name='donationDate'
-                        type='date'
-                        className='formInput'
-                        max={getFormattedDate()}
-                        value={this.state.donationDate}
-                        onChange={this.handleChange}
-                        required />
-                    </section>
-                    <section className='formSection'>
-                        <label>
-                            Weight:
-                        </label>
-                        <input
-                        name='weight'
-                        type='number'
-                        min='40'
-                        max='200'
-                        placeholder='Enter Weight'
-                        className='formInput'
-                        value={this.state.weight}
-                        onChange={this.handleChange}
-                        required />
-                    </section>
-                    <section className='formSection'>
-                        <label>
-                            Amount:
-                        </label>
-                        <select
-                        name='amount'
-                        className='formInput'
-                        value={this.state.amount}
-                        onChange={this.handleChange}
-                        required>
-                            {[250, 500, 750, 1000].map(value => {
-                                return (
-                                    <option key={value}>{value}</option>
-                                )
-                            })}
-                        </select>
-                    </section>
-                    <section className='formSection'>
-                        <input
-                        value='Add New Entry'
-                        type='submit' />
-                    </section>
+                    <fieldset>
+                        <legend>New Blood Donation Date</legend>
+                        <section className='formSection'>
+                            <div>
+                                <label> Blood Donation Date: </label>
+                                <input
+                                name='donationDate'
+                                type='date'
+                                className='formInput'
+                                max={getFormattedDate()}
+                                value={this.state.donationDate}
+                                onChange={this.handleChange}
+                                required />
+                            </div>
+                            <div>
+                                <label>
+                                    Weight:
+                                </label>
+                                <input
+                                name='weight'
+                                type='number'
+                                min='40'
+                                max='200'
+                                placeholder='Enter Weight'
+                                className='formInput'
+                                value={this.state.weight}
+                                onChange={this.handleChange}
+                                required />
+                            </div>
+                            <div>
+                                <label>
+                                    Amount:
+                                </label>
+                                <select
+                                name='amount'
+                                className='formInput'
+                                value={this.state.amount}
+                                onChange={this.handleChange}
+                                required>
+                                    {[250, 500, 750, 1000].map(value => {
+                                        return (
+                                            <option key={value}>{value}</option>
+                                        )
+                                    })}
+                                </select>
+                            </div>
+                        </section>
+                        <section className='formSection'>
+                            <input
+                            value='Add New Entry'
+                            type='submit' />
+                        </section>
+                    </fieldset>
                 </form>
             </div>
         );

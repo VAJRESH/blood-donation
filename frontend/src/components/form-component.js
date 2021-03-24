@@ -4,6 +4,22 @@ import '../css/form-style.css';
 
 import { sortArray, getFormattedDate } from '../helper/functions';
 
+const FormSection = function (props){
+    return (
+        <section className='formSection'>
+            <label>{props.label}</label>
+            <input
+            name={props.input.name}
+            type={props.input.type}
+            placeholder={props.input.placeholder}
+            className='formInput'
+            value={props.input.value}
+            onChange={props.input.onChange}
+            required />
+        </section>
+    )
+}
+
 export default class FormComponent extends Component{
     constructor(props){
         super(props);
@@ -13,7 +29,9 @@ export default class FormComponent extends Component{
         this.onSubmit = this.onSubmit.bind(this);
 
         this.state = {
-            name: '',
+            firstName: '',
+            middleName: '',
+            lastName: '',
             dob: '2000-01-01',
             gender: 'Male',
             weight: '',
@@ -57,7 +75,9 @@ export default class FormComponent extends Component{
     onSubmit(e){
         e.preventDefault();
         const info = {
-            name: this.state.name,
+            firstName: this.state.firstName,
+            middleName: this.state.middleName,
+            lastName: this.state.lastName,
             dateOfBirth: this.state.dob,
             gender: this.state.gender,
             weight: this.state.weight,
@@ -83,155 +103,158 @@ export default class FormComponent extends Component{
     render(){
         return(
             <div className='formContainer'>
-                <a href='/'>Donors</a>
-                <h2>Blood Donation Details</h2>
                 <form onSubmit={this.onSubmit}>
                     <fieldset>
-                        <legend>Personal Information</legend>
+                        <legend>Blood Donor Details</legend>
                         <section className='formSection'>
-                            <label>
-                                Name:
-                            </label>
-                            <input
-                            name='name'
-                            type='text'
-                            placeholder='John Doe'
-                            className='formInput'
-                            value={this.state.name}
-                            onChange={this.handleChange}
-                            required />
+                            <div>
+                                <label> First Name * </label>
+                                <input
+                                name='firstName' type='text'
+                                placeholder='John'
+                                className='formInput'
+                                value={this.state.firstName}
+                                onChange={this.handleChange}
+                                required />
+                            </div>
+                            <div>
+                                <label> Middle Name </label>
+                                <input
+                                name='middleName' type='text'
+                                placeholder='Stuart'
+                                className='formInput'
+                                value={this.state.middleName}
+                                onChange={this.handleChange} />
+                            </div>
+                            <div>
+                                <label> Last Name * </label>
+                                <input
+                                name='lastName' type='text'
+                                placeholder='Doe'
+                                className='formInput'
+                                value={this.state.lastName}
+                                onChange={this.handleChange}
+                                required />
+                            </div>
                         </section>
 
                         <section className='formSection'>
-                            <label>
-                                Date Of Birth:
-                            </label>
-                            <input
-                            name='dob'
-                            type='date'
-                            className='formInput'
-                            max={getFormattedDate()}
-                            value={this.state.dob}
-                            onChange={this.handleChange}
-                            required />
-                        </section>
-
-                        <section className='formSection'>
-                            <label>
-                                Gender:
-                            </label>
-                            <select name='gender' onChange={this.handleChange} className='formInput'>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </section>
-
-                        <section className='formSection'>
-                            <label>
-                                Weight:
-                            </label>
-                            <input
-                            name='weight'
-                            type='number'
-                            min='40'
-                            max='200'
-                            placeholder='60'
-                            className='formInput'
-                            value={this.state.weight}
-                            onChange={this.handleChange}
-                            required />
-                        </section>
-                    </fieldset>
-                    <fieldset>
-                        <legend>Donation Details</legend>
-                        <section className='formSection'>
-                            <label>
-                                Latest Blood Donation Date:
-                            </label>
-                            <input
-                            name='donationDate'
-                            type='date'
-                            className='formInput'
-                            max={getFormattedDate()}
-                            value={this.state.donationDate}
-                            onChange={this.handleChange}
-                            required />
-                        </section>
-                        <section className='formSection'>
-                            <label>
-                                Blood Group:
-                            </label>
-                            <select name='bloodGroup' onChange={this.handleChange} value={this.state.bloodGroup} className='formInput'>
-                                {this.bloodGroupArray.map(value => (
-                                    <option key={value} value={value}>{value}</option>
-                                ))}
-                            </select>
-                        </section>
-                        <section className='formSection'>
-                            <label>
-                                Amount:
-                            </label>
-                            <select name='amount' onChange={this.handleChange} value={this.state.amount} className='formInput'>
-                                {this.donationAmount.map(value => (
-                                    <option key={value} value={value}>{value}</option>
-                                ))}
-                            </select>
-                        </section>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend>Contact Details</legend>
-                        <section className='formSection'>
-                            <label>
-                                Phone Number:
-                            </label>
-                            <input
-                            name='phoneNumber'
-                            min='1000000000'
-                            max='10000000000'
-                            type='number'
-                            placeholder='8845808080'
-                            className='formInput'
-                            value={this.state.phoneNumber}
-                            onChange={this.handleChange}
-                            required />
-                        </section>
-
-                        <section className='formSection'>
-                            <label>
-                                Email:
-                            </label>
-                            <input
-                            name='email'
-                            type='email'
-                            placeholder='johndoe@gmail.com'
-                            className='formInput'
-                            value={this.state.email}
-                            onChange={this.handleChange}
-                            required />
+                            <div>
+                                <label>Date Of Birth * </label>
+                                <input
+                                name='dob' type='date'
+                                className='formInput'
+                                max={getFormattedDate()}
+                                value={this.state.dob}
+                                placeholder='Donation'
+                                onChange={this.handleChange}
+                                required />
+                            </div>
+                            <div>
+                                <label>Gender *</label>
+                                <select
+                                    name='gender' 
+                                    onChange={this.handleChange} 
+                                    className='formInput'
+                                    required >
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Weight *</label>
+                                <input
+                                name='weight' type='number'
+                                min='40'
+                                max='200'
+                                placeholder='60'
+                                className='formInput'
+                                value={this.state.weight}
+                                onChange={this.handleChange}
+                                required />
+                            </div>
                         </section>
                         
+                        
                         <section className='formSection'>
-                            <label>
-                                Address:
-                            </label>
-                            <textarea
-                                name='address'
-                                placeholder='Arther Street, Bandra'
+                            <div>
+                                <label>Phone Number *</label>
+                                <input
+                                name='phoneNumber'
+                                min='1000000000'
+                                max='10000000000'
+                                type='number'
+                                placeholder='8845808080'
                                 className='formInput'
-                                value={this.state.address}
+                                value={this.state.phoneNumber}
                                 onChange={this.handleChange}
-                                required>
-                            </textarea>
+                                required />
+                            </div>
+                            <div>
+                                <label>Email *</label>
+                                <input
+                                name='email' type='email'
+                                placeholder='johndoe@gmail.com'
+                                className='formInput'
+                                value={this.state.email}
+                                onChange={this.handleChange}
+                                required />
+                            </div>
+                        </section>
+
+                        
+                        <section className='formSection'>
+                            <div>
+                                <label>Address</label>
+                                <textarea
+                                    name='address'
+                                    placeholder='Arther Street, Bandra'
+                                    className='formInput'
+                                    value={this.state.address}
+                                    onChange={this.handleChange} >
+                                </textarea>
+                            </div>
+                        </section>
+
+                        <section className='formSection'>
+                            <div>
+                                <label>Blood Donation Date</label>
+                                <input
+                                name='donationDate' type='date'
+                                className='formInput'
+                                max={getFormattedDate()}
+                                value={this.state.donationDate}
+                                onChange={this.handleChange} />
+                            </div>
+                            <div>
+                                <label>Blood Group *</label>
+                                <select 
+                                    name='bloodGroup' 
+                                    onChange={this.handleChange} 
+                                    value={this.state.bloodGroup} 
+                                    className='formInput'
+                                    required>
+                                    {this.bloodGroupArray.map(value => (
+                                        <option key={value} value={value}>{value}</option>
+                                        ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label>Amount</label>
+                                <select name='amount' onChange={this.handleChange} value={this.state.amount} className='formInput'>
+                                    {this.donationAmount.map(value => (
+                                        <option key={value} value={value}>{value}</option>
+                                        ))}
+                                </select>
+                            </div>
+                        </section>
+
+                        <section className='formSection'>
+                            <input
+                                value={this.id? 'update': 'submit'}
+                                type='submit' />
                         </section>
                     </fieldset>
-
-
-                    <section className='formSection'>
-                        <input
-                        value={this.id? 'update': 'submit'}
-                        type='submit' />
-                    </section>
                 </form>
             </div>
         )
