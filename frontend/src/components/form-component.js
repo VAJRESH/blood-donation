@@ -4,21 +4,21 @@ import '../css/form-style.css';
 
 import { sortArray, getFormattedDate } from '../helper/functions';
 
-const FormSection = function (props){
-    return (
-        <section className='formSection'>
-            <label>{props.label}</label>
-            <input
-            name={props.input.name}
-            type={props.input.type}
-            placeholder={props.input.placeholder}
-            className='formInput'
-            value={props.input.value}
-            onChange={props.input.onChange}
-            required />
-        </section>
-    )
-}
+// const FormSection = function (props){
+//     return (
+//         <section className='formSection'>
+//             <label>{props.label}</label>
+//             <input
+//             name={props.input.name}
+//             type={props.input.type}
+//             placeholder={props.input.placeholder}
+//             className='formInput'
+//             value={props.input.value}
+//             onChange={props.input.onChange}
+//             required />
+//         </section>
+//     )
+// }
 
 export default class FormComponent extends Component{
     constructor(props){
@@ -105,7 +105,7 @@ export default class FormComponent extends Component{
             <div className='formContainer'>
                 <form onSubmit={this.onSubmit}>
                     <fieldset>
-                        <legend>Blood Donor Details</legend>
+                        <h1>Blood Donor Details</h1>
                         <section className='formSection'>
                             <div>
                                 <label> First Name * </label>
@@ -113,6 +113,7 @@ export default class FormComponent extends Component{
                                 name='firstName' type='text'
                                 placeholder='John'
                                 className='formInput'
+                                id='smallWidth'
                                 value={this.state.firstName}
                                 onChange={this.handleChange}
                                 required />
@@ -123,6 +124,7 @@ export default class FormComponent extends Component{
                                 name='middleName' type='text'
                                 placeholder='Stuart'
                                 className='formInput'
+                                id='smallWidth'
                                 value={this.state.middleName}
                                 onChange={this.handleChange} />
                             </div>
@@ -132,6 +134,7 @@ export default class FormComponent extends Component{
                                 name='lastName' type='text'
                                 placeholder='Doe'
                                 className='formInput'
+                                id='smallWidth'
                                 value={this.state.lastName}
                                 onChange={this.handleChange}
                                 required />
@@ -144,6 +147,7 @@ export default class FormComponent extends Component{
                                 <input
                                 name='dob' type='date'
                                 className='formInput'
+                                id='smallWidth'
                                 max={getFormattedDate()}
                                 value={this.state.dob}
                                 placeholder='Donation'
@@ -156,6 +160,7 @@ export default class FormComponent extends Component{
                                     name='gender' 
                                     onChange={this.handleChange} 
                                     className='formInput'
+                                    id='smallWidth'
                                     required >
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
@@ -169,6 +174,7 @@ export default class FormComponent extends Component{
                                 max='200'
                                 placeholder='60'
                                 className='formInput'
+                                id='smallWidth'
                                 value={this.state.weight}
                                 onChange={this.handleChange}
                                 required />

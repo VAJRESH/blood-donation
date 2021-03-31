@@ -16,19 +16,16 @@
     width: 100vw;
     background-color: var(--pure-white);
 }
-legend{
-    position: relative;
-    top: 0;
+h1{
     color: var(--heading);
-    font-style: italic;
     font-weight: bold;
     font-size: 2rem;
+    margin: 1em;
 }
 .formContainer > form{
     height: 90vh;
     width: 65vw;
     margin: auto;
-    font-style: italic;
 }
 fieldset{
     border-radius: 8px;
@@ -40,7 +37,7 @@ fieldset{
     justify-content: space-between;
     text-align: left;
     margin: auto;
-    width: 60vw;
+    width: 600px;
 }
 .formSection:nth-child(4){
     grid-template-columns: 49% 49%;
@@ -54,6 +51,10 @@ fieldset{
 .formSection > div{
     position: relative;
     margin: 0.3em;
+    text-align: center;
+}
+#smallWidth{
+    width: 170px;
 }
 .formInput{
     width: 100%;
@@ -62,6 +63,7 @@ fieldset{
     border: 2px outset var(--light-shade);
 }
 label{
+    display: block;
     padding: 5px;
 }
 .formSection > label, .formInput{
