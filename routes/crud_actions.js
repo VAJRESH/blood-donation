@@ -43,12 +43,15 @@ router.route('/add').post((req, res) => {
     const dateOfBirth = req.body.dateOfBirth;
     const gender = req.body.gender;
     const weight = req.body.weight;
-    const bloodGroup = req.body.bloodGroup;
-    const donationDate = req.body.donationDate;
-    const donationAmount = req.body.donationAmount;
     const phoneNumber = req.body.phoneNumber;
     const email = req.body.email;
     const address = req.body.address;
+    const landmark = req.body.landmark;
+    const city = req.body.city;
+    const pinCode = req.body.pinCode;
+    const bloodGroup = req.body.bloodGroup;
+    const donationDate = req.body.donationDate;
+    const donationAmount = req.body.donationAmount;
 
     const newDonor = new Donor({
         first_name,
@@ -57,12 +60,15 @@ router.route('/add').post((req, res) => {
         dateOfBirth,
         gender,
         weight,
+        phoneNumber,
+        email,
+        address,
+        landmark,
+        city,
+        pinCode,
         bloodGroup,
         donationDate,
         donationAmount,
-        phoneNumber,
-        email,
-        address
     });
 
     newDonor.save()

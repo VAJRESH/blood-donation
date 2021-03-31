@@ -2,24 +2,9 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import '../css/form-style.css';
 
-import { sortArray, getFormattedDate } from '../helper/functions';
+import { getFormattedDate } from '../helper/functions';
 
-// const FormSection = function (props){
-//     return (
-//         <section className='formSection'>
-//             <label>{props.label}</label>
-//             <input
-//             name={props.input.name}
-//             type={props.input.type}
-//             placeholder={props.input.placeholder}
-//             className='formInput'
-//             value={props.input.value}
-//             onChange={props.input.onChange}
-//             required />
-//         </section>
-//     )
-// }
-
+// form component which takes required user entry and saves it to the database when submitted.
 export default class FormComponent extends Component{
     constructor(props){
         super(props);
@@ -27,7 +12,8 @@ export default class FormComponent extends Component{
 
         this.handleChange = this.handleChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
-
+        this.generateErrorMessage = this.generateErrorMessage.bind(this);
+        // can't think of any alternative for this much key, that why working with this now, do update if you find anything better
         this.state = {
             firstName: '',
             middleName: '',
@@ -35,43 +21,121 @@ export default class FormComponent extends Component{
             dob: '2000-01-01',
             gender: 'Male',
             weight: '',
-            bloodGroup: 'A+',
-            donationDate: getFormattedDate(),
-            amount: 250,
             phoneNumber: '',
             email: '',
-            address: ''
+            address: '',
+            landmark: '',
+            city: '',
+            pinCode: '',
+            donationDate: '',
+            bloodGroup: 'A+',
+            amount: 0,
+            database: '',
+            errorMessage: {
+                firstName: false,
+                middleName: false,
+                lastName: false,
+                dob: false,
+                gender: false,
+                weight: false,
+                phoneNumber: false,
+                email: false,
+                address: false,
+                landmark: false,
+                city: false,
+                pinCode: false,
+                bloodGroup: false,
+                donationDate: false,
+                amount: false,
+            }
         }
     }
+    // this array is for dropdown used in the form
     bloodGroupArray = [
         'A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'
     ]
     donationAmount = [ 250, 500, 750, 1000 ]
-    componentDidMount(){
-        if(this.id){
-            axios.get('/donor/'+this.id)
-                .then(res => {
-                    console.log(res.data)
-                    res.data.donationDate = sortArray(res.data.donationDate);
-                    this.setState({
-                        name: res.data.name,
-                        dob: getFormattedDate(new Date(res.data.dateOfBirth)),
-                        gender: res.data.gender,
-                        weight: res.data.weight,
-                        bloodGroup: res.data.bloodGroup,
-                        donationDate: getFormattedDate(new Date(res.data.donationDate[res.data.donationDate.length-1])),
-                        phoneNumber: res.data.phoneNumber,
-                        email: res.data.email,
-                        address: res.data.address
-                    })
-                })
+    // used to display error messages when the conditions are not met, parameter takes the event because it can be used to update the fields
+    generateErrorMessage(eventTarget){
+        const [field, value] = [eventTarget.name, eventTarget.value];
+
+        const errorMessage = this.state.errorMessage;
+        // single object which can be used to apply conditions instead of using multiple if else statements
+        const errorObj = {
+            weight: {
+                condition: value < 40 || value > 200,
+                message: 'enter valid weight'
+            },
+            phoneNumber: {
+                condition: value.length !== 10,
+                message: 'enter valid phone number'
+            },
+            email: {
+                condition: !value.includes('@'),
+                message: 'enter valid email'    
+            },
+            address: {
+                condition: value.length < 5,
+                message: 'enter valid address'
+            },
+            city: {
+                condition: value.includes(' '),
+                message: 'space are not allowed use "-"'
+            },
+            pinCode:{
+                condition: value.length !== 6 || value.charAt(0) === '0',
+                message: 'enter valid pin code'
+            }
+        }
+        
+        // general validator for first, middle and last name
+        if(field.includes('Name')){
+            errorObj[field] = {
+                condition: value.length < 3,
+                message: 'not 3 character long'
+            };
+        }
+        // make the input border green for every field whose value has been changed
+        eventTarget.parentNode.children[1].style.borderColor = 'green';
+        
+        // validator using the above obj conditions which pops up error message and makes the input border red
+        if(errorObj[field]){
+            if(errorObj[field].condition){
+                errorMessage[field] = errorObj[field].message;
+                eventTarget.parentNode.children[1].style.borderColor = 'red';
+                
+                this.setState({
+                    errorMessage: errorMessage 
+                });
+            } else{
+                errorMessage[field] = false;
+                this.setState({
+                    errorMessage: errorMessage 
+                });
+            }
+        }
+        // since i used a general validator above middle name(if changed) gets affected and shows error until validated, 
+        // since the field is not compulsory, the pop up message should disappear when no value is entered.
+        if(field === 'middleName' && value.length === 0){
+            errorMessage[field] = false;
+            eventTarget.parentNode.children[1].style.borderColor = '';
+            this.setState({
+                errorMessage: errorMessage 
+            });
         }
     }
+    // captures and updates the state and validates the change in input box
     handleChange(e){
         const updateState = {};
+        if(e.target.name === 'city' && e.target.value.includes('ombiv')){
+            e.target.value = 'Dombivli';
+        }
         updateState[e.target.name] = e.target.value;
         this.setState(updateState);
+
+        this.generateErrorMessage(e.target);
     }
+    // submits the value to the back end
     onSubmit(e){
         e.preventDefault();
         const info = {
@@ -83,32 +147,47 @@ export default class FormComponent extends Component{
             weight: this.state.weight,
             phoneNumber: this.state.phoneNumber,
             email: this.state.email,
+            address: this.state.address,
+            landmark: this.state.landmark,
+            city: this.state.city,
+            pinCode: this.state.pinCode,
             bloodGroup: this.state.bloodGroup,
             donationDate: this.state.donationDate,
             donationAmount: this.state.amount,
-            address: this.state.address
         }
-        console.log(info);
-        alert(JSON.stringify(info));
-        if(this.id){
-            axios.post('/donor/updateDetails/'+this.id, info)
-                .then(res => console.log(res.data.message))
-                .catch(err => console.log(err));
-        } else{
+
+        if(Object.values(this.state.errorMessage).every(value => value === false)){
             axios.post('/donor/add', info)
-                .then(res => console.log(res.data.message))
+                .then(res => this.setState({
+                    database: res.data.message
+                }))
                 .catch(err => console.log(err));
         }
+        setTimeout(() => {
+            this.setState({
+                database: ''
+            })
+        }, 5000);
+    }
+    // pop up box for invalid data entries
+    errorBox(message){
+        return <div className='errorBox'>{message}</div>;
     }
     render(){
         return(
             <div className='formContainer'>
+                {
+                    this.state.database !== '' &&
+                    <section id='messageBox'>
+                        {this.state.database}
+                    </section>
+                }
                 <form onSubmit={this.onSubmit}>
                     <fieldset>
                         <h1>Blood Donor Details</h1>
                         <section className='formSection'>
                             <div>
-                                <label> First Name * </label>
+                                <label>First Name: *</label>
                                 <input
                                 name='firstName' type='text'
                                 placeholder='John'
@@ -117,9 +196,10 @@ export default class FormComponent extends Component{
                                 value={this.state.firstName}
                                 onChange={this.handleChange}
                                 required />
+                                { this.state.errorMessage.firstName && this.errorBox(this.state.errorMessage.firstName)}
                             </div>
                             <div>
-                                <label> Middle Name </label>
+                                <label>Middle Name: </label>
                                 <input
                                 name='middleName' type='text'
                                 placeholder='Stuart'
@@ -127,9 +207,10 @@ export default class FormComponent extends Component{
                                 id='smallWidth'
                                 value={this.state.middleName}
                                 onChange={this.handleChange} />
+                                { this.state.errorMessage.middleName && this.errorBox(this.state.errorMessage.middleName)}
                             </div>
                             <div>
-                                <label> Last Name * </label>
+                                <label>Last Name: *</label>
                                 <input
                                 name='lastName' type='text'
                                 placeholder='Doe'
@@ -138,12 +219,13 @@ export default class FormComponent extends Component{
                                 value={this.state.lastName}
                                 onChange={this.handleChange}
                                 required />
+                                { this.state.errorMessage.lastName && this.errorBox(this.state.errorMessage.lastName)}
                             </div>
                         </section>
 
                         <section className='formSection'>
                             <div>
-                                <label>Date Of Birth * </label>
+                                <label>Date Of Birth: *</label>
                                 <input
                                 name='dob' type='date'
                                 className='formInput'
@@ -153,9 +235,10 @@ export default class FormComponent extends Component{
                                 placeholder='Donation'
                                 onChange={this.handleChange}
                                 required />
+                                { this.state.errorMessage.dob && this.errorBox(this.state.errorMessage.dob)}
                             </div>
                             <div>
-                                <label>Gender *</label>
+                                <label>Gender: *</label>
                                 <select
                                     name='gender' 
                                     onChange={this.handleChange} 
@@ -165,9 +248,10 @@ export default class FormComponent extends Component{
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
                                 </select>
+                                { this.state.errorMessage.gender && this.errorBox(this.state.errorMessage.gender)}
                             </div>
                             <div>
-                                <label>Weight *</label>
+                                <label>Weight: *</label>
                                 <input
                                 name='weight' type='number'
                                 min='40'
@@ -178,13 +262,14 @@ export default class FormComponent extends Component{
                                 value={this.state.weight}
                                 onChange={this.handleChange}
                                 required />
+                                { this.state.errorMessage.weight && this.errorBox(this.state.errorMessage.weight)}
                             </div>
                         </section>
                         
                         
                         <section className='formSection'>
                             <div>
-                                <label>Phone Number *</label>
+                                <label>Phone Number: *</label>
                                 <input
                                 name='phoneNumber'
                                 min='1000000000'
@@ -195,9 +280,10 @@ export default class FormComponent extends Component{
                                 value={this.state.phoneNumber}
                                 onChange={this.handleChange}
                                 required />
+                                { this.state.errorMessage.phoneNumber && this.errorBox(this.state.errorMessage.phoneNumber)}
                             </div>
                             <div>
-                                <label>Email *</label>
+                                <label>Email: *</label>
                                 <input
                                 name='email' type='email'
                                 placeholder='johndoe@gmail.com'
@@ -205,35 +291,73 @@ export default class FormComponent extends Component{
                                 value={this.state.email}
                                 onChange={this.handleChange}
                                 required />
+                                { this.state.errorMessage.email && this.errorBox(this.state.errorMessage.email)}
                             </div>
                         </section>
 
-                        
                         <section className='formSection'>
                             <div>
-                                <label>Address</label>
+                                <label>Address: *</label>
                                 <textarea
                                     name='address'
-                                    placeholder='Arther Street, Bandra'
+                                    placeholder='201/A, Regency'
                                     className='formInput'
                                     value={this.state.address}
-                                    onChange={this.handleChange} >
+                                    onChange={this.handleChange}
+                                    required >
                                 </textarea>
+                                { this.state.errorMessage.address && this.errorBox(this.state.errorMessage.address)}
                             </div>
                         </section>
 
                         <section className='formSection'>
                             <div>
-                                <label>Blood Donation Date</label>
+                                <label>Landmark:</label>
+                                <input
+                                name='landmark' type='text'
+                                className='formInput'
+                                placeholder='Opp. DNS Bank'
+                                value={this.state.landmark}
+                                onChange={this.handleChange} />
+                                { this.state.errorMessage.landmark && this.errorBox(this.state.errorMessage.landmark)}
+                            </div>
+                            <div>
+                                <label>City: *</label>
+                                <input
+                                name='city' type='text'
+                                className='formInput'
+                                placeholder='Dombivli'
+                                value={this.state.city}
+                                onChange={this.handleChange} 
+                                required />
+                                { this.state.errorMessage.city && this.errorBox(this.state.errorMessage.city)}
+                            </div>
+                            <div>
+                                <label>Pin Code:</label>
+                                <input
+                                name='pinCode' type='number'
+                                className='formInput'
+                                placeholder='421201'
+                                value={this.state.pinCode}
+                                onChange={this.handleChange}
+                                required />
+                                { this.state.errorMessage.pinCode && this.errorBox(this.state.errorMessage.pinCode)}
+                            </div>
+                        </section>
+
+                        <section className='formSection'>
+                            <div>
+                                <label>Blood Donation Date:</label>
                                 <input
                                 name='donationDate' type='date'
                                 className='formInput'
                                 max={getFormattedDate()}
                                 value={this.state.donationDate}
                                 onChange={this.handleChange} />
+                                { this.state.errorMessage.donationDate && this.errorBox(this.state.errorMessage.donationDate)}
                             </div>
                             <div>
-                                <label>Blood Group *</label>
+                                <label>Blood Group: *</label>
                                 <select 
                                     name='bloodGroup' 
                                     onChange={this.handleChange} 
@@ -244,20 +368,22 @@ export default class FormComponent extends Component{
                                         <option key={value} value={value}>{value}</option>
                                         ))}
                                 </select>
+                                { this.state.errorMessage.bloodGroup && this.errorBox(this.state.errorMessage.bloodGroup)}
                             </div>
                             <div>
-                                <label>Amount</label>
+                                <label>Amount:</label>
                                 <select name='amount' onChange={this.handleChange} value={this.state.amount} className='formInput'>
                                     {this.donationAmount.map(value => (
                                         <option key={value} value={value}>{value}</option>
                                         ))}
                                 </select>
+                                { this.state.errorMessage.amount && this.errorBox(this.state.errorMessage.amount)}
                             </div>
                         </section>
 
                         <section className='formSection'>
                             <input
-                                value={this.id? 'update': 'submit'}
+                                value='Submit'
                                 type='submit' />
                         </section>
                     </fieldset>
