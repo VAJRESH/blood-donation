@@ -42,9 +42,30 @@ const bloodGroupArray = [
     'A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'
 ]
 
+function getLastTwoDates(array){
+    const months = [
+        'January', 'February', 'March', 'April', 'May', 'June', 'July', 
+        'August', 'September', 'October', 'November', 'December'
+    ];
+    let i = array.length-1;
+    let j = i - 2;
+    const displayDates = [];
+    for(i; i>j; --i){
+        let dateObj = new Date(array[i]);
+        let year = dateObj.getFullYear();
+        let month = months[dateObj.getMonth()];
+        let date = dateObj.getDate();
+        if(month){
+            displayDates.push(`${year} ${month} ${date}`);
+        }
+    }
+    return displayDates;
+}
+
 export {
     sortArray,
     getAge,
     getFormattedDate,
-    bloodGroupArray
+    bloodGroupArray,
+    getLastTwoDates
 };

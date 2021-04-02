@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 
+// .env file import which is used to store confidential data like mongodb database password
 require('dotenv').config();
+
+// typical express server set up with basic functionality to listen to requests and respond to it
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -29,6 +32,7 @@ app.use(express.json());
 const donor = require('./routes/crud_actions');
 app.use('/donor', donor);
 
+// this is to serve the react app to the browser.
 const publicPath = path.join(__dirname, 'frontend', 'build');
 
 app.use(express.static(publicPath));
@@ -38,4 +42,4 @@ app.get('*', (req, res) => {
 
 app.listen(port, function() {
     console.log(`Server running on port ${port}`);
-})
+});

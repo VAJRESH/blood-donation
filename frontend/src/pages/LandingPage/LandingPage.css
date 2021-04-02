@@ -1,6 +1,27 @@
 .container{
     text-align: center;
 }
+.filterBox{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80vw;
+    margin: auto;
+}
+.filterBox > div{
+    display: flex;
+    flex-direction: row;
+}
+select, input {
+    border-radius: 5px;
+    border-color: rgb(0, 0, 0);
+    padding: 0 5px;
+}
+.downloadBtn{
+    position: absolute;
+    right: 10px;
+    top: 50px;
+}
 table, th, td{
     border: 1px solid rgb(161, 155, 155);
     padding: 5px;
@@ -18,9 +39,14 @@ th{
 }
 td{
     margin: 10px;
-    /* background-color: rgb(242, 184, 247); */
 }
 tr:nth-child(even){
     background-color: rgb(214, 211, 211);
     margin: auto;
+}
+.actionBox button{
+    margin: auto 5px;
+}
+.fas{
+    font-size: 1.15rem;
 }

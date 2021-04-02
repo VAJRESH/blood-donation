@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-import { getFormattedDate } from '../helper/functions';
+import { getFormattedDate } from '../../../helper/functions';
 
 class DonationDate extends Component {
     constructor(props){
@@ -30,8 +30,6 @@ class DonationDate extends Component {
             ...this.state,
             userId: this.id
         }
-        console.log(info);
-        alert(JSON.stringify(info));
 
         axios.post('/donor/addDate/'+this.id, info)
             .then(res => console.log(res.data.message))

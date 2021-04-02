@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import '../css/form-style.css';
+import '../Style/form-style.css';
 
-import { getFormattedDate } from '../helper/functions';
+import { getFormattedDate } from '../../../helper/functions';
 
 // form component which takes required user entry and saves it to the database when submitted.
+// I used class component because its setState() function has the ability to update a single entry and update will be merged with original state 
+// needs to be refactored as it has too much code
 export default class FormComponent extends Component{
     constructor(props){
         super(props);
@@ -63,11 +65,11 @@ export default class FormComponent extends Component{
         // single object which can be used to apply conditions instead of using multiple if else statements
         const errorObj = {
             weight: {
-                condition: value < 40 || value > 200,
+                condition: value < 20 || value > 200,
                 message: 'enter valid weight'
             },
             phoneNumber: {
-                condition: value.length !== 10,
+                condition: value.length !== 10 || value === '',
                 message: 'enter valid phone number'
             },
             email: {
@@ -114,7 +116,7 @@ export default class FormComponent extends Component{
                 });
             }
         }
-        // since i used a general validator above middle name(if changed) gets affected and shows error until validated, 
+        // since I used a general validator earlier(above) middle name(if changed) gets affected and shows error until validated, 
         // since the field is not compulsory, the pop up message should disappear when no value is entered.
         if(field === 'middleName' && value.length === 0){
             errorMessage[field] = false;
@@ -137,6 +139,9 @@ export default class FormComponent extends Component{
     }
     // submits the value to the back end
     onSubmit(e){
+        this.setState({
+            database: 'Loading'
+        })
         e.preventDefault();
         const info = {
             firstName: this.state.firstName,
@@ -159,6 +164,21 @@ export default class FormComponent extends Component{
         if(Object.values(this.state.errorMessage).every(value => value === false)){
             axios.post('/donor/add', info)
                 .then(res => this.setState({
+                    firstName: '',
+                    middleName: '',
+                    lastName: '',
+                    dob: '2000-01-01',
+                    gender: 'Male',
+                    weight: '',
+                    phoneNumber: '',
+                    email: '',
+                    address: '',
+                    landmark: '',
+                    city: '',
+                    pinCode: '',
+                    donationDate: '',
+                    bloodGroup: 'A+',
+                    amount: 0,
                     database: res.data.message
                 }))
                 .catch(err => console.log(err));

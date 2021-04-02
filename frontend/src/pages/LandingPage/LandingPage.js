@@ -1,34 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
 
-import DisplayListTable from '../../components/Table/DisplayListTable';
+import useManageData from './Logic/ManageData';
+import FilterList from '../../components/Table/FilterList';
 import './LandingPage.css';
 
-// class component which will show donors list in a table
-export default function LandingPage() {
-    const [Donor, setDonor] = useState();
 
-    useEffect(() => {
-        axios.get('/donor')
-            .then(res => setDonor(res.data))
-            .catch(err => console.log(err));
-    }, []);
-    
-    function deleteEntryById(id){      
-        axios.delete(`/donor/${id}`)
-            .then(res => {
-                console.log(res.data.message);
-                alert(res.data.message);
-                setDonor(Donor.filter(person => person._id !== id))
-            })
-            .catch(err => console.log(err));
-    }
+// class component which will show donors list in a table, this is UI, logic is in Logic folder
+export default function LandingPage() {
+    const [
+        Donor, filter, saveFilters,
+        setIsFilterOn, setFilterData, showList
+    ] = useManageData();
+
     let loading = (Donor === undefined) ? 
         ( <> Loading </> ) : 
         (
             <>
                 <h1>Entries Added</h1>
-                <DisplayListTable donorData={Donor || []} deleteEntry={deleteEntryById}/>
+                <section>
+                    <div className='filterBox'>
+                        <FilterList 
+                        handleChange={filter} 
+                        donorData={Donor} 
+                        filter={saveFilters.current}/>
+                        <button onClick={() => {
+                            setIsFilterOn(false);
+                            setFilterData();
+                            saveFilters.current = {
+                                name: '',
+                                bloodGroup: '',
+                                city: ''
+                            };
+                        }}>
+                            Remove filter
+                        </button>
+                    </div>
+                    { showList() }
+                </section>
             </>
         );
     return (

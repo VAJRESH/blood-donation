@@ -17,6 +17,18 @@
 - [x] [CRUD actions](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) on entries.
 - [ ] UI design for the whole app(if anyone have suggestion feel free to contact me!)
 
+## Versions
+- This is the version 1.00 which has basic functionality to be used with okish UI.
+- I will continue working for new and better versions.
+- Current Functionalities are 
+    - Adding New Donor Info.
+    - Viewing all donors info in tabular format.
+    - Filters for searching particular donor in the table.
+    - Download the filtered table value as PDF.
+    - Add new donation date and amount to a existing user.
+    - Able to view and edit a existing user data.
+    - Delete a user.
+
 ## Technologies And Support
 - [Mongodb](https://www.mongodb.com/3) as Database.
 - [Express](https://expressjs.com/) as Backend Framework.

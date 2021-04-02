@@ -5,36 +5,46 @@ import axios from 'axios';
 import './profile.css';
 import Section from '../../components/Section/Section';
 import InlineInputEdit from '../../components/Section/InlineInputEdit';
-import { sortArray, getAge, getFormattedDate, bloodGroupArray } from '../../helper/functions';
+import { sortArray, getAge, getFormattedDate, bloodGroupArray, getLastTwoDates } from '../../helper/functions';
 
+
+// this class component needs to be refactored, it was too complex at the moment to separate the logic and 
+// due date was near so I didn't refactored
+// what needs to be done
+// separate the logic and UI, reduce the code if possible  
 class Profile extends Component {
     constructor(props){
         super(props);
-        
         this.id = props.match.params.id;
 
         this.state = {
             person:'',
             update: '',
-            isEditOn: {
+            databaseResponse: '',
+            errorMessage: {
                 weight: false,
-                email: false,
                 phoneNumber: false,
+                email: false,
                 address: false,
-                donationDate: [false, false],
+                landmark: false,
+                city: false,
+                pinCode: false,
+                donationDate: false,
             },
+            isEditOn: props.location.state || false,
             age: 0
         }
         this.donationDates = this.donationDates.bind(this);
-        this.editContent = this.editContent.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.handleEvents = this.handleEvents.bind(this);
+        this.handleEdit = this.handleEdit.bind(this);
+        this.cancelEdit = this.cancelEdit.bind(this);
+        this.submitValue = this.submitValue.bind(this);
     }
     componentDidMount(){
         axios.get('/donor/'+this.id)
             .then(res => {
                 res.data.donationDate = sortArray(res.data.donationDate)
-                console.log(res.data)
+                
                 this.setState({
                     person: res.data,
                     update: res.data
@@ -42,80 +52,104 @@ class Profile extends Component {
             })
             .catch(err => console.log(err));
     }
-    getLastTwoDates(array){
-        const months = [
-            'January', 'February', 'March', 'April', 'May', 'June', 'July', 
-            'August', 'September', 'October', 'November', 'December'
-        ];
-        let i = array.length-1;
-        let j = i - 2;
-        const displayDates = [];
-        for(i; i>j; --i){
-            let dateObj = new Date(array[i]);
-            let year = dateObj.getFullYear();
-            let month = months[dateObj.getMonth()];
-            let date = dateObj.getDate();
-            if(month){
-                displayDates.push(`${year} ${month} ${date}`);
-            }
-        }
-        return displayDates;
-    }
     donationDates(){
         if(this.state.person !== ''){
             return (
                 // TODO edit value only after enter is press
-                this.getLastTwoDates(this.state.person.donationDate)
+                getLastTwoDates(this.state.person.donationDate)
                 .map((dates, index) => {
-                    console.log(this.state.person.donationDate)
                     const lengthOfDateArray = this.state.person.donationDate.length;
                     let arrayIndex = index===0? lengthOfDateArray-1: lengthOfDateArray-2;
                     return (
                         this.state.update.donationDate &&
                         <p key={dates+Math.random()}>
                             <span 
-                                name={`donationDate${index}`}
-                                className={`inline-text inline-text-${this.state.isEditOn.donationDate[index]? 'hidden': 'active'}`}
-                                onClick={this.editContent}
-                                >
-                                    {dates}
+                            name={`donationDate${index}`}
+                            className={`inline-text inline-text-${this.state.isEditOn? 'hidden': 'active'}`}
+                            >
+                                {dates}
                             </span>
                             <input 
-                                name={`donationDate${index}`}
-                                type='date'
-                                ref={e => e && e.focus()}
-                                onChange={this.handleChange}
-                                onFocus={this.handleEvents}
-                                onBlur={this.editContent}
-                                max={getFormattedDate()}
-                                value={getFormattedDate(this.state.update.donationDate[arrayIndex])}
-                                className={`input input-${this.state.isEditOn.donationDate[index]? 'active': 'hidden'}`}
-                                />
+                            name={`donationDate${index}`}
+                            type='date'
+                            onChange={this.handleChange}
+                            max={getFormattedDate()}
+                            value={getFormattedDate(this.state.update.donationDate[arrayIndex])}
+                            className={`input input-${this.state.isEditOn ? 'active' : 'hidden'}`}
+                            />
                         </p>
                     );
                 })
             )
         }
     }
-    editContent(e){
+    handleEdit(e){
         console.log(e.target)
-        let changeEditOn = {...this.state.isEditOn}, key = e.target.getAttribute('name');
-        if(key.includes('donationDate')){
-            let index = key.endsWith(0)? 0: 1;
-            key = key.slice(0, key.length-1);
-            changeEditOn[key][index] = !this.state.isEditOn[key][index]; 
-        } else {
-            changeEditOn[key] = !this.state.isEditOn[key]; 
+        if(!this.state.isEditOn){
+            this.setState({isEditOn: true});
         }
+        if(this.state.isEditOn){
+            this.submitValue()
+            this.setState({isEditOn: false});
+        }
+    }
+    cancelEdit(){
         this.setState({
-            isEditOn: changeEditOn
+            isEditOn: false,
+            errorMessage: {
+                weight: false,
+                phoneNumber: false,
+                email: false,
+                address: false,
+                landmark: false,
+                city: false,
+                pinCode: false,
+                donationDate: false,
+            }
         })
     }
     handleChange(e){
-        console.log(e)
+        console.log(e.target)
+        console.log(e.target.value)
         console.log(this.state.person.donationDate)
         const updatedValue = {...this.state.update};
         let key = e.target.name;
+        const value = e.target.value;
+        const validator = {
+            weight: {
+                condition: value < 20 || value > 200,
+                message: 'enter valid weight'
+            },
+            phoneNumber: {
+                condition: value.length !== 10 || value === '',
+                message: 'enter valid phone number'
+            },
+            email: {
+                condition: !value.includes('@'),
+                message: 'enter valid email'
+            },
+            address: {
+                condition: value.length < 5,
+                message: 'enter valid address'
+            },
+            city: {
+                condition: value.includes(' '),
+                message: 'space are not allowed use "-"'
+            },
+            pinCode:{
+                condition: value.length !== 6 || value.charAt(0) === '0',
+                message: 'enter valid pin code'
+            }
+        }
+        console.log('asa')
+        const errorMessage = this.state.errorMessage;
+        if(validator[key].condition){
+            errorMessage[key] = `Not Valid ${key}`;
+            this.setState({ errorMessage: errorMessage });
+        } else {
+            errorMessage[key] = '';
+            this.setState({ errorMessage: errorMessage })
+        }
         if(key.includes('donationDate')){
             let index = key.endsWith(0)? 0: 1;
             index = index === 0? 
@@ -131,26 +165,36 @@ class Profile extends Component {
         });
         console.log(this.state.person.donationDate)
     }
-    handleEvents(e){
-        e.target.addEventListener('keypress', value => {
-            if(value.key === 'Enter'){
-                console.log(value.key)
-                const updatedValue = {...this.state.update};
-                const originalValue = {...this.state.person};
-                updatedValue[e.target.name] = e.target.value;
-                originalValue[e.target.name] = e.target.value;
-                this.setState({
-                    person: originalValue,
-                }); 
-                console.log(updatedValue)
-                console.log(this.state.update)
-                axios.post('/donor/updateDetails/'+this.id, originalValue)
-                    .then(res => console.log(res.data.message))
-                    .catch(err => console.log(err));
-                    e.target.blur();
-                console.log(e.target)
-            }
-        })
+    submitValue(){
+        if(!Object.values(this.state.errorMessage).every(value => value === false)){
+            this.setState({ databaseResponse: 'Please Enter Valid Details' });
+            this.setState({
+                errorMessage: {
+                    weight: false,
+                    phoneNumber: false,
+                    email: false,
+                    address: false,
+                    landmark: false,
+                    city: false,
+                    pinCode: false,
+                    donationDate: false,
+                }
+            })
+            return (
+                setTimeout(() => {
+                    this.setState({
+                        databaseResponse: ''
+                    })
+                }, 2000)
+            )
+        }
+        const updatedValue = {...this.state.update};
+        this.setState({
+            person: updatedValue,
+        });
+        axios.post('/donor/updateDetails/'+this.id, updatedValue)
+            .then(res => this.setState({ databaseResponse: res.data.message }))
+            .catch(err => console.log(err));
     }
     render() {
         const donorData = [
@@ -231,7 +275,7 @@ class Profile extends Component {
                             max: '200',
                             value: this.state.update.weight
                         },
-                        toggleEdit: this.state.isEditOn.weight
+                        toggleEdit: this.state.isEditOn
                     }
                 ]
             },
@@ -248,7 +292,7 @@ class Profile extends Component {
                             type: 'email',
                             value: this.state.update.email,
                         },
-                        toggleEdit: this.state.isEditOn.email
+                        toggleEdit: this.state.isEditOn
                     },
                     {
                         displayValue: {
@@ -260,35 +304,62 @@ class Profile extends Component {
                             type: 'email',
                             value: this.state.update.address,
                         },
-                        toggleEdit: this.state.isEditOn.address
+                        toggleEdit: this.state.isEditOn
                     },
                     {
                         displayValue: {
-                            name: 'Phone Number: ',
-                            value: this.state.person.phoneNumber
+                            name: 'Landmark: ',
+                            value: this.state.person.landmark
                         },
                         input: {
-                            name: 'phoneNumber',
-                            type: 'number',
-                            value: this.state.update.phoneNumber,
+                            name: 'landmark',
+                            type: 'text',
+                            value: this.state.update.landmark,
                         },
-                        toggleEdit: this.state.isEditOn.phoneNumber
+                        toggleEdit: this.state.isEditOn
+                    },
+                    {
+                        displayValue: {
+                            name: 'City: ',
+                            value: this.state.person.city
+                        },
+                        input: {
+                            name: 'city',
+                            type: 'text',
+                            value: this.state.update.city,
+                        },
+                        toggleEdit: this.state.isEditOn
+                    },
+                    {
+                        displayValue: {
+                            name: 'Pin Code: ',
+                            value: this.state.person.pinCode
+                        },
+                        input: {
+                            name: 'pinCode',
+                            type: 'number',
+                            value: this.state.update.pinCode,
+                        },
+                        toggleEdit: this.state.isEditOn
                     },
                 ]
             },
         ]
-        const toggleInput = ['weight', 'email', 'donationDate0'];
         return (
-            <div>
+            <div>                
+                {
+                    this.state.databaseResponse !== '' &&
+                    <section id='messageBox'>
+                        {this.state.databaseResponse}
+                    </section>
+                }
                 {
                     this.state.update.first_name &&
                     donorData.map((info, index)=> {
-                        console.log(toggleInput[index]);
                         return (
                             <Section 
                                 title={info.name} 
                                 key={info.name}
-                                name={toggleInput[index]}
                                 onClick={this.editContent}>
                                 {
                                     info.data.map(detail => {
@@ -302,9 +373,10 @@ class Profile extends Component {
                                                 toggleEdit={detail.toggleEdit}
                                                 handlers={
                                                     detail.toggleEdit !== undefined?
-                                                    [this.handleChange, this.handleEvents, this.editContent]:
+                                                    [this.handleChange]:
                                                     []
                                                 }
+                                                errorMessage={this.state.errorMessage}
                                                 key={detail.displayValue.name || Math.random()}
                                             />
                                         )
@@ -315,10 +387,7 @@ class Profile extends Component {
                     })
 
                 }
-                <Section 
-                    title='Recent Donation Date'
-                    name={toggleInput[2]}
-                    onClick={this.editContent}>
+                <Section title='Recent Donation Date' >
                     {this.donationDates()}
                     <Link to={`/donation/${this.id}`}>Add New Entry</Link>
                 </Section>
@@ -336,6 +405,13 @@ class Profile extends Component {
                         </p>
                     }
                 </Section>
+                <button onClick={this.handleEdit}>
+                    { this.state.isEditOn? 'Update': 'Edit Profile' }
+                </button>
+                {
+                    this.state.isEditOn &&
+                    <button onClick={this.cancelEdit}>Cancel</button>
+                }
             </div>
         );
     }

@@ -1,24 +1,21 @@
 const express = require('express');
-const { update } = require('../models/donors.model');
 
 let Donor = require('../models/donors.model');
 let router = express.Router();
-
-// const capitalizeFirstLetter = name => {}
 
 //** GET REQUESTS
 // get all entries
 router.route('/').get((req, res) => {
     Donor.find({})
         .then(donor => res.json(donor))
-        .catch(err => res.status(400).json('Error: ' + err));
+        .catch(err => console.log(`Error: ${err}`));
 });
 
 // search for a single entry
 router.route('/:id').get((req, res) => {
     Donor.findById(req.params.id)
         .then(donor => res.json(donor))
-        .catch(err => res.status(400).json(`Error: ${err}`));
+        .catch(err => console.log(`Error: ${err}`));
 });
 
 
@@ -29,17 +26,23 @@ router.route('/:id').delete((req, res) => {
     .then(donor => {
         res.json({ message: `${donor.first_name}'s entry deleted` })
     })
-    .catch(err => res.status(400).json(`Error: ${err}`));
+    .catch(err => console.log(`Error: ${err}`));
 });
 
+//** Helper Function
+// it is used to save the data with same pattern in the database for consistency
+function capitalizeFirstLetter(value){
+    // return if the value is undefined mostly in case of middle name
+    if(!value) return '';
+    return value[0].toUpperCase()+ value.slice(1)
+}
 
 //** POST REQUESTS
 // add new entry
 router.route('/add').post((req, res) => {
-    console.log(req.body);
-    const first_name = req.body.firstName;
-    const middle_name = req.body.middleName;
-    const last_name = req.body.lastName;
+    const first_name = capitalizeFirstLetter(req.body.firstName);
+    const middle_name = capitalizeFirstLetter(req.body.middleName);
+    const last_name = capitalizeFirstLetter(req.body.lastName);
     const dateOfBirth = req.body.dateOfBirth;
     const gender = req.body.gender;
     const weight = req.body.weight;
@@ -47,33 +50,26 @@ router.route('/add').post((req, res) => {
     const email = req.body.email;
     const address = req.body.address;
     const landmark = req.body.landmark;
-    const city = req.body.city;
+    const city = capitalizeFirstLetter(req.body.city);
     const pinCode = req.body.pinCode;
     const bloodGroup = req.body.bloodGroup;
     const donationDate = req.body.donationDate;
     const donationAmount = req.body.donationAmount;
 
     const newDonor = new Donor({
-        first_name,
-        middle_name,
-        last_name,
-        dateOfBirth,
-        gender,
-        weight,
-        phoneNumber,
-        email,
-        address,
-        landmark,
-        city,
-        pinCode,
-        bloodGroup,
-        donationDate,
+        first_name, middle_name,
+        last_name, dateOfBirth,
+        gender, weight,
+        phoneNumber, email,
+        address, landmark,
+        city, pinCode,
+        bloodGroup, donationDate,
         donationAmount,
     });
 
     newDonor.save()
         .then(() => res.json({ message: `${newDonor.first_name} entry added` }))
-        .catch(err => res.status(400).json(`Error: ${console.log(err)}`));
+        .catch(err => console.log(`Error: ${err}`));
 });
 
 // update a entry
@@ -81,13 +77,14 @@ router.route('/updateDetails/:id').post((req, res) => {
     Donor.findById(req.params.id)
         .then(donor => {
             let valueUpdated;
-            donor[req.body]
+            // first loop for all the keys database donor object and 
+            // second loop for all keys of received object and 
+            // then check if the both objects value is matched for updating that particular value 
             for(donorKeys in donor){
                 for(updateKeys in req.body){
                     if(donorKeys === updateKeys){
                         if(donor[donorKeys] !== req.body[updateKeys]){
                             donor[donorKeys] = req.body[updateKeys];
-                            // console.log(donor[donorKeys]);
                             valueUpdated = donorKeys;
                         } else if(donorKeys === 'donationDate'){
                             donor[donorKeys] = req.body[updateKeys];
@@ -95,61 +92,35 @@ router.route('/updateDetails/:id').post((req, res) => {
                     }
                 }
             }
-            console.log(donor);
+
             donor.save()
-                .then(() => res.json({message: `${donor.first_name}'s ${valueUpdated} updated` }))
-                .catch(err => res.status(400).json(`Error: ${console.log(err)}`));
-            })
-            .catch(err => res.status(400).json(`Error: ${console.log(err)}`));
+                .then(() => res.json({message: `${donor.first_name}'s updated` }))
+                .catch(err => console.log(`Error: ${err}`));
+        })
+        .catch(err => console.log(`Error: ${err}`));
 });
-
-// update a entry
-// router.route('/updateDetails/:id').post((req, res) => {
-//     Donor.findById(req.params.id)
-//         .then(donor => {
-//             console.log(donor)
-//             const dateArray =  donor.donationDate;
-//             dateArray[0] = req.body.donationDate;
-//             donor.name = req.body.name;
-//             donor.dateOfBirth = req.body.dateOfBirth;
-//             donor.gender = req.body.gender;
-//             donor.weight = req.body.weight;
-//             donor.bloodGroup = req.body.bloodGroup;
-//             donor.donationDate = dateArray;
-//             donor.donationAmount = req.body.donationAmount;
-//             donor.phoneNumber = req.body.phoneNumber;
-//             donor.email = req.body.email;
-//             donor.address = req.body.address;
-        
-
-//             donor.save()
-//                 .then(() => res.json({message: `${donor.name}'s entry updated` }))
-//                 .catch(err => res.status(400).json(`Error: ${console.log(err)}`));
-//             })
-//             .catch(err => res.status(400).json(`Error: ${console.log(err)}`));
-// });
 
 router.route('/addDate/:id').post((req, res) => {
     Donor.findById(req.params.id)
         .then(donor => {
-            // add new data
+            // received data is added for further validation
             donor.donationDate.push(req.body.donationDate);
             donor.weight = req.body.weight;
             donor.donationAmount += req.body.amount;
             return donor;
         })
         .then(donor => {
-            // sorting dates from oldest to latest
+            // sorting dates from oldest to latest for comparing the dates in order
             donor.donationDate.sort((a, b) => {
                 return new Date(a)-new Date(b);
             });
-            console.log(donor)
-            // filtering if any dates are less than 3 months
+            // filtering if any dates are less than 3 months because we can donate blood only after a gap of 3 months 
             const lengthOfDonationDates = donor.donationDate.length;
             for(let i=0; i< lengthOfDonationDates; ++i){
                 if(i===0) continue;
                 const date1 = new Date(donor.donationDate[i-1]);
                 const date2 = new Date(donor.donationDate[i]);
+                // gets total months difference between two dates
                 let months = date2.getMonth()-date1.getMonth() + 12*(date2.getFullYear() - date1.getFullYear());
                 if(date2.getDate() < date1.getDate()){
                     --months;
@@ -162,7 +133,7 @@ router.route('/addDate/:id').post((req, res) => {
             return donor;
         })
         .then(donor => {
-            // save the data in database
+            // save the data in database if it is valid
             donor.save()
                 .then(() => res.json({message: `New Donation Date added in ${donor.first_name} profile` }))
                 .catch(err => res.status(400).json(`Error: ${console.log(err)}`));

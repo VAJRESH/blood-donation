@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 import Navbar from './components/Navbar/Navbar';
 import LandingPage from './pages/LandingPage/LandingPage';
-import FormComponent from './components/form-component';
-import DonationDate from './components/donation-date-form';
+import FormComponent from './pages/Forms/NewDonorEntryForm/DonorEntryForm';
+import DonationDate from './pages/Forms/NewDonationByDonor/RecentDonationForm';
 import Profile from './pages/Profile/Profile';
 
 function App() {
